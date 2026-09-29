@@ -407,6 +407,8 @@ let gx = 0, gy = 0, tgx = 0, tgy = 0;   // gyro (eased)
 let dx = 0, dy = 0;                       // drag tilt (spring back)
 const REST_X = -5, REST_Y = -8;           // resting tilt (avoids dead-on overexposure)
 const PITCH_LIMIT = 25;                   // maximum vertical card tilt in either direction
+const GYRO_YAW_GAIN = 1.5;                // horizontal phone tilt to card rotation multiplier
+const GYRO_YAW_INPUT_LIMIT = 60;           // maximum horizontal phone tilt delta used
 let dragging = false;
 let prevVisible = true;
 let lastDrawX = 999, lastDrawY = 999;
@@ -506,7 +508,11 @@ function onOrientation(e) {
   // wrap not needed for small tilt
   const b = db, g = dg;
   tgx = clamp(-b * Math.cos(ang) + g * Math.sin(ang), -PITCH_LIMIT, PITCH_LIMIT);
-  tgy = clamp(g * Math.cos(ang) - b * Math.sin(ang), -14, 14) * 0.7;
+  tgy = clamp(
+    g * Math.cos(ang) - b * Math.sin(ang),
+    -GYRO_YAW_INPUT_LIMIT,
+    GYRO_YAW_INPUT_LIMIT,
+  ) * GYRO_YAW_GAIN;
 }
 function ensureGyro() {
   if (gyroStarted) return;
